@@ -1,0 +1,123 @@
+#pragma once
+/*
+ * binarySearchTree.h
+ *
+ *  Created on: Dec 5, 2018
+ *      Author: Hanna Kessler
+ */
+
+#ifndef BINARYSEARCHTREE_H_
+#define BINARYSEARCHTREE_H_
+#include <iostream>
+#include <cstring>
+//treeNode class
+
+template<class Datatype>
+class treeNode
+{
+	friend class binarySearchTree<Datatype>;
+
+private:
+	treeNode<Datatype> *parent;
+	treeNode<Datatype> *leftChild;
+	treeNode<Datatype> *rightChild;
+	Datatype data;
+public:
+	//constructor for first node, unconnected to anything else but still containing data
+	treeNode<Datatype>(DataType newData) {
+		data = newData;
+		parent = nullptr;
+		leftChild = nullptr;
+		rightChild = nullptr;
+	}
+
+	//constructor for a node with a parent but no children yet
+	treeNode<Datatype>(treeNode<Datatype> *newParent, Datatype newData) {
+		data = newData;
+		parent = newParent;
+		leftChild = nullptr;
+		rightChild = nullptr;
+	}
+
+	//constructor for a node with a parent and one or more children, pass nullprt if child or parent doesn't exist
+	treeNode<Datatype>(treeNode<Datatype> *newParent, treeNode<Datatype> *newLeftChild, treeNode<Datatype> *newRightChild, Datatype newData) {
+		data = newData;
+		parent = newParent;
+		leftChild = newLeftChild;
+		rightChild = newRightChild;
+	}
+	~treeNode<Datatype>() {}
+};
+
+
+//binarySearchTree class
+
+template<class Datatype>
+class binarySearchTree
+{
+private:
+	std::size_t nodeCount;
+	treeNode<Datatype> *root;
+public:
+
+	//default constructor makes an empty binary search tree with zero entries and a null root
+	binarySearchTree<Datatype>() {
+		nodeCount = 0;
+		root = nullptr;
+	}
+	binarySearchTree<Datatype>(binarySearchTree &other);
+	
+	~binarySearchTree<Datatype>();
+	
+	binarySearchTree<Datatype> operator=(binarySearchTree<Datatype> &other);
+	
+	bool empty() const {
+		return nodeCount == 0;
+	}
+	
+	std::size_t size() const {
+		return nodeCount;
+	}
+	
+	void print() const;
+	void debug(std::ostream &out) const;
+	bool find(const DataType &searchItem, void(*foundNode)(const DataType&));
+	
+	bool erase(const DataType &deleteItem);
+	
+	//inserts the new item into the tree by creating a treenode with this data and connecting it in the proper position
+	void insert(const Datatype &newItem) {
+		//if it's empty, make this the root node
+		if (empty()) {
+			root = new treeNode(newItem);
+			nodeCount++;
+			return;
+		}
+		//traverse the tree until a leaf is found, then create a new leaf and return
+		treeNode<Datatype> *currentNode = root;
+		while (currentNode != nullptr) {
+			if (newItem > currentNode->data) {
+				if (currentNode->rightChild == nullptr) {
+					currentNode->rightChild = new treeNode<Datatype>(currentNode, newItem);
+					nodeCount++;
+					return;
+				}
+				currentNode = currentNode->rightChild;
+			}
+			else
+			{
+				if (currentNode->leftChild == nullptr) {
+					currentNode->leftChild = new treeNode<Datatype>(currentNode, newItem);
+					nodeCount++;
+					return;
+				}
+				currentNode = currentNode->leftChild;
+			}
+		}
+	}
+	void insert(const DataType &newItem, void(*duplicateItemFound)(Datatype &existingItem, const DataType &newItem));
+	void traverse(void(*itemFound)(const DataType &foundItem)) const;
+
+};
+
+#endif /* BINARYSEARCHTREE_H_ */
