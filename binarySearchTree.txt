@@ -10,7 +10,7 @@
 #define BINARYSEARCHTREE_H_
 #include <iostream>
 #include <cstring>
-//treeNode class
+ //treeNode class
 
 template<class Datatype>
 class treeNode
@@ -58,6 +58,8 @@ class binarySearchTree
 private:
 	std::size_t nodeCount;
 	treeNode<Datatype> *root;
+
+	treeNode<Datatype> *findPointer(Datatype findItem);
 public:
 
 	//default constructor makes an empty binary search tree with zero entries and a null root
@@ -66,25 +68,32 @@ public:
 		root = nullptr;
 	}
 	binarySearchTree<Datatype>(binarySearchTree &other);
-	
+
 	~binarySearchTree<Datatype>();
-	
+
 	binarySearchTree<Datatype> operator=(binarySearchTree<Datatype> &other);
-	
+
 	bool empty() const {
 		return nodeCount == 0;
 	}
-	
+
 	std::size_t size() const {
 		return nodeCount;
 	}
-	
+
 	void print() const;
 	void debug(std::ostream &out) const;
 	bool find(const DataType &searchItem, void(*foundNode)(const DataType&));
-	
-	bool erase(const DataType &deleteItem);
-	
+
+	bool erase(const DataType &deleteItem) {
+		treeNode<Datatype> *found = findPointer(deleteItem);
+		if (found == nullptr) {
+			return false;
+		}
+
+
+	}
+
 	//inserts the new item into the tree by creating a treenode with this data and connecting it in the proper position
 	void insert(const Datatype &newItem) {
 		//if it's empty, make this the root node
@@ -115,7 +124,16 @@ public:
 			}
 		}
 	}
-	void insert(const DataType &newItem, void(*duplicateItemFound)(Datatype &existingItem, const DataType &newItem));
+
+	//if the data is a duplicate, call the duplicateItemFound function, otherwise insert it normally 
+	void insert(const DataType &newItem, void(*duplicateItemFound)(Datatype &existingItem, const DataType &newItem)) {
+		treeNode<DataType> *found = findPointer(newItem);
+		if (found != nullptr) {
+			duplicateItemFound(found->data, newItem);
+			return;
+		}
+		insert(newItem);
+	}
 	void traverse(void(*itemFound)(const DataType &foundItem)) const;
 
 };
