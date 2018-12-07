@@ -1,0 +1,20 @@
+#include "word.h"
+#include "binarySearchTree.h"
+#include <iostream>
+int main() {
+	int stay;
+	binarySearchTree<word> dictionary;
+	word pie("pie");
+	word basil("basil");
+	word Basketball("Basketball");
+	word apple("apple");
+	word Jupiter("Jupiter");
+
+	dictionary.insert(pie);
+	dictionary.insert(basil);
+	dictionary.insert(Basketball);
+	dictionary.insert(apple);
+	dictionary.insert(Jupiter);
+
+	std::cin >> stay;
+}

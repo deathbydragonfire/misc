@@ -1,0 +1,45 @@
+/*
+ * word.h
+ *
+ *  Created on: Dec 7, 2018
+ *      Author: Hanna Kessler
+ */
+
+#ifndef WORD_H_
+#define WORD_H_
+#include <string>
+#include <cctype>
+#include <algorithm>
+#include <vector>
+class word
+{
+
+private:
+	std::vector<std::string> data;
+	std::string key;
+public:
+
+	word(std::string str);
+
+	std::string getKey() const {
+		return key;
+	}
+
+	std::vector<std::string> getData() const {
+		return data;
+	}
+
+	void addWord(std::string newWord);
+	~word() {}
+};
+
+bool operator==(word firstWord, word secondWord);
+
+bool operator<(word firstWord, word secondWord);
+
+bool operator>(word firstWord, word secondWord);
+
+bool operator!=(word firstWord, word secondWord);
+
+std::ostream& operator<<(std::ostream &out, const word &outWord);
+#endif /* COMMAND_H_ */

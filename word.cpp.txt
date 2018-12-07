@@ -1,0 +1,49 @@
+#include "word.h"
+
+word::word(std::string str) {
+	data.insert(data.begin(), str);
+	key = str;
+
+	for (int i = 0; i < key.size(); i++) {
+		key[i] = std::tolower(key[i]);
+	}
+
+	std::sort(key.begin(), key.end());
+}
+
+void word::addWord(std::string newWord) {
+	data.insert(data.end(), newWord);
+}
+
+std::ostream& operator<<(std::ostream &out, const word &outWord) {
+	out << "[";
+	out << outWord.getKey() << ", {";
+
+	for (unsigned int i = 0; i < outWord.getData().size(); i++) {
+		out << outWord.getData()[i];
+		if (i < outWord.getData().size() - 1) {
+			out << ", ";
+		}
+		else {
+			out << "}]";
+		}
+	}
+	out << std::endl;
+	return out;
+}
+
+bool operator==(word firstWord, word secondWord) {
+	return firstWord.getKey() == secondWord.getKey();
+}
+
+bool operator<(word firstWord, word secondWord) {
+	return firstWord.getKey() < secondWord.getKey();
+}
+
+bool operator>(word firstWord, word secondWord) {
+	return firstWord.getKey() > secondWord.getKey();
+}
+
+bool operator!=(word firstWord, word secondWord) {
+	return firstWord.getKey() != secondWord.getKey();
+}

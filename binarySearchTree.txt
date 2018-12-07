@@ -11,6 +11,10 @@
 #include <iostream>
 #include <cstring>
  //treeNode class
+template<class Datatype>
+class binarySearchTree;
+
+
 
 template<class Datatype>
 class treeNode
@@ -24,7 +28,7 @@ private:
 	Datatype data;
 public:
 	//constructor for first node, unconnected to anything else but still containing data
-	treeNode<Datatype>(DataType newData) {
+	treeNode<Datatype>(Datatype &newData) {
 		data = newData;
 		parent = nullptr;
 		leftChild = nullptr;
@@ -32,7 +36,7 @@ public:
 	}
 
 	//constructor for a node with a parent but no children yet
-	treeNode<Datatype>(treeNode<Datatype> *newParent, Datatype newData) {
+	treeNode<Datatype>(treeNode<Datatype> *newParent, Datatype &newData) {
 		data = newData;
 		parent = newParent;
 		leftChild = nullptr;
@@ -40,7 +44,7 @@ public:
 	}
 
 	//constructor for a node with a parent and one or more children, pass nullprt if child or parent doesn't exist
-	treeNode<Datatype>(treeNode<Datatype> *newParent, treeNode<Datatype> *newLeftChild, treeNode<Datatype> *newRightChild, Datatype newData) {
+	treeNode<Datatype>(treeNode<Datatype> *newParent, treeNode<Datatype> *newLeftChild, treeNode<Datatype> *newRightChild, Datatype &newData) {
 		data = newData;
 		parent = newParent;
 		leftChild = newLeftChild;
@@ -59,7 +63,23 @@ private:
 	std::size_t nodeCount;
 	treeNode<Datatype> *root;
 
-	treeNode<Datatype> *findPointer(Datatype findItem);
+	treeNode<Datatype> *findPointer(Datatype findItem) {
+		treeNode<Datatype> *current = root;
+		while (current != nullptr) {
+			if (current->data == findItem) {
+				return current;
+			}
+
+			if (findItem > current->data) {
+				current = current->rightChild;
+			}
+			else {
+				current = current->leftChild;
+			}
+		}
+		return current;
+	}
+
 public:
 
 	//default constructor makes an empty binary search tree with zero entries and a null root
@@ -67,7 +87,9 @@ public:
 		nodeCount = 0;
 		root = nullptr;
 	}
-	binarySearchTree<Datatype>(binarySearchTree &other);
+	binarySearchTree<Datatype>(binarySearchTree &other) {
+		this = other;
+	}
 
 	~binarySearchTree<Datatype>();
 
@@ -82,15 +104,72 @@ public:
 	}
 
 	void print() const;
-	void debug(std::ostream &out) const;
-	bool find(const DataType &searchItem, void(*foundNode)(const DataType&));
+	void debug(std::ostream &out) const {
+		
+	}
 
-	bool erase(const DataType &deleteItem) {
-		treeNode<Datatype> *found = findPointer(deleteItem);
+	bool find(const Datatype &searchItem, void(*foundNode)(const Datatype&)) {
+		treeNode<Datatype> *found = findPointer(searchItem);
 		if (found == nullptr) {
 			return false;
 		}
 
+		foundNode(found->data);
+		return true;
+	}
+
+	bool erase(const Datatype &deleteItem) {
+		treeNode<Datatype> *found = findPointer(deleteItem);
+		if (found == nullptr) {
+			return false;			//if it doesn't exist, don't delete anything and return false.
+		}
+
+		treeNode<Datatype> *right = found->rightChild;
+		treeNode<Datatype> *left = found->leftChild;
+		treeNode<Datatype> *par = found->parent;
+		bool isRight = found->data > par->data;
+
+		delete(found);	//delete this node
+		nodeCount--;
+
+		if (right == nullptr) {
+			if (left == nullptr) {    //if both children are null (this node is a leaf)
+				if (isRight) {  //if it is right
+					par->rightChild = nullptr;  //set parent right child to null
+				}
+				else {
+					par->leftChild = nullptr;  //otherwise set parent left child to null
+				}
+				
+				return true; 
+			}
+			
+			//if right is null but not left
+			if (isRight) {
+				par->rightChild = left;  //connect the left node to parent's right
+			}
+			else {
+				par->leftChild = left;  //or parent's left
+			}
+
+			
+			return true;
+		}
+
+		if (left == nullptr) {  //if left is null but not right
+			if (isRight) {
+				par->rightChild = right;  //set parent's right child to right
+			}
+			else {
+				par->leftChild = right;  // or parent;s left child to right
+			}
+			return true;
+		}
+		
+		//TODO
+		//if neither is null then you gotta do cool things
+		//idr how this works
+		//HALP
 
 	}
 
@@ -98,7 +177,7 @@ public:
 	void insert(const Datatype &newItem) {
 		//if it's empty, make this the root node
 		if (empty()) {
-			root = new treeNode(newItem);
+			root = new treeNode<Datatype>(newItem);
 			nodeCount++;
 			return;
 		}
@@ -126,16 +205,22 @@ public:
 	}
 
 	//if the data is a duplicate, call the duplicateItemFound function, otherwise insert it normally 
-	void insert(const DataType &newItem, void(*duplicateItemFound)(Datatype &existingItem, const DataType &newItem)) {
-		treeNode<DataType> *found = findPointer(newItem);
+	void insert(const Datatype &newItem, void(*duplicateItemFound)(Datatype &existingItem, const Datatype &newItem)) {
+		treeNode<Datatype> *found = findPointer(newItem);
 		if (found != nullptr) {
 			duplicateItemFound(found->data, newItem);
 			return;
 		}
 		insert(newItem);
 	}
-	void traverse(void(*itemFound)(const DataType &foundItem)) const;
+	void traverse(void(*itemFound)(const Datatype &foundItem)) const {
+		//TODO Recursive fun stuff
+	}
 
 };
+template<class Datatype>
+void addToTree(binarySearchTree<Datatype> tree, Datatype &data) {
+	tree.insert(data);
+}
 
 #endif /* BINARYSEARCHTREE_H_ */
